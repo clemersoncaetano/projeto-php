@@ -67,7 +67,7 @@ class GerenciamentoDeCompraController extends Controller
     public function registrarCompra(Request $request)
     {
         return DB::transaction(function () {
-            $primeiro = gerenciamentodefilacontrollerController::orderBy('id')->first();
+            $primeiro = GerenciamentoDeFila::orderBy('id')->first();
 
             if (!$primeiro) {
                 return response()->json(['message' => 'Fila vazia!'], 400);
@@ -81,7 +81,7 @@ class GerenciamentoDeCompraController extends Controller
 
             $primeiro->delete();
 
-            gerenciamentodefilacontrollerController::create([
+            GerenciamentoDeFila::create([
                 'user_id' => $compra->user_id,
                 'ativo' => true,
             ]);

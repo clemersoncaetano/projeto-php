@@ -37,5 +37,8 @@ public function adicionarpedido(CriarFilaRequest $request)
             return response()->json(['msg' => 'Nenhum pedido pendente na fila.']);
         }
     }
-
+    public function index()
+    {
+        return response()->json(['msg' => 'Gerenciamento de Fila ativo']);
+    }
 }
