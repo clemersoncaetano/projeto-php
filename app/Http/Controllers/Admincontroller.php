@@ -15,7 +15,7 @@ public function criarUsuario(TokenRequest $request)
 {
     $validado = $request->validated();
 
-    $user = new User();
+    $user = new user();
     $user->name = $validado['name'];
     $user->email = $validado['email'];
     $user->password = Hash::make($validado['password']);
@@ -35,7 +35,6 @@ public function criarUsuario(TokenRequest $request)
         'user' => $user
     ], 201);
 }
-
 
     public function listarUsuarios()
     {

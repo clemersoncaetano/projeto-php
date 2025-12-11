@@ -13,7 +13,7 @@ public function adicionarpedido(CriarFilaRequest $request)
        $Order = Order::create([
         'Cliente' => $request->Cliente,
         'bebida' => $request->bebida,
-        'status' => 'pendente',
+        'status' => '',
        ]);
          return response()->json(['msg' => 'Pedido adicionado com sucesso!', 'pedido' => $Order]);
     
