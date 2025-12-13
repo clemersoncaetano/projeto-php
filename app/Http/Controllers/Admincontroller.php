@@ -11,7 +11,7 @@ use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 
 
-class AdminController extends controller
+class AdminController extends Controller
 {
 public function criarUsuario(TokenRequest $request)
 {
@@ -59,7 +59,7 @@ public function criarUsuario(TokenRequest $request)
         
         $validado = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,.$id'],
+            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,' .$id],
             'password' => ['sometimes', 'required', 'string', 'min:8', 'confirmed'],
         ]);
         $user = User::findOrFail($id);
@@ -131,7 +131,7 @@ public function criarUsuario(TokenRequest $request)
         
         $validado = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,.$id'],
+            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,'.$id],
             'password' => ['sometimes', 'required', 'string', 'min:8', 'confirmed'],
         ]);
         $admin = User::findOrFail($id);
