@@ -27,7 +27,7 @@ public function adicionarpedido(CriarFilaRequest $request)
     }
 
 
-    public function processarPróximo(){
+    public function processarProximo(){
         $pedido = Order::where('status', 'pendente')->orderby('id')->first();
         if ($pedido) {
             $pedido->status = 'processando';

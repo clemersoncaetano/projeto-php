@@ -7,9 +7,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\loginRequest;
+use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 
-class UserController extends Controller
+
+class AdminController extends controller
 {
 public function criarUsuario(TokenRequest $request)
 {
@@ -20,15 +22,21 @@ public function criarUsuario(TokenRequest $request)
     $user->email = $validado['email'];
     $user->password = Hash::make($validado['password']);
     $user->save();
-
-
-    $ultimaPosicao = DB::table('gerenciamento_de_filas')->max('position') ?? 0;
-
-    DB::table('gerenciamento_de_filas')->insert([
-        'user_id' => $user->id,
-        'position' => $ultimaPosicao + 1,
-        'ativo' => true,
+    
+    Order::create([
+        'Cliente' => $user->name,
+        'bebida' => 'agua',
+        'status' => 'pendente',
     ]);
+
+    $ultimaPosicao = DB::table('gerenciamento_filas')->max('position') ?? 0;
+
+    DB::table('gerenciamento_filas')->insert([
+        'userId' => $user->id,
+        'position' => $ultimaPosicao + 1,
+    ]);
+
+   
 
     return response()->json([
         'message' => 'Usuário criado e adicionado à fila com sucesso!',
@@ -51,7 +59,7 @@ public function criarUsuario(TokenRequest $request)
         
         $validado = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,'],
+            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,.$id'],
             'password' => ['sometimes', 'required', 'string', 'min:8', 'confirmed'],
         ]);
         $user = User::findOrFail($id);
@@ -123,7 +131,7 @@ public function criarUsuario(TokenRequest $request)
         
         $validado = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,'],
+            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,.$id'],
             'password' => ['sometimes', 'required', 'string', 'min:8', 'confirmed'],
         ]);
         $admin = User::findOrFail($id);

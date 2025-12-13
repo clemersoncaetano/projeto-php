@@ -1,18 +1,20 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GerenciamentoDeFilaController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ProdutoController;
+use App\Http\Controllers\Admincontroller;
 
-Route::get('/filas', [GerenciamentoDeFilaController::class ,'index']);
-Route::post('/filas/adicionarpedido', [GerenciamentoDeFilaController::class, 'adicionarpedido']);
-Route::get('/filas/listarFila', [GerenciamentoDeFilaController::class, 'listarFila']);
-Route::post('/filas/processarProximo', [GerenciamentoDeFilaController::class, 'processarPróximo']);
+Route::post('/usuario/criar', [AdminController::class, 'criarUsuario']);
+Route::get('/usuarios', [AdminController::class, 'listarUsuarios']);
+Route::get('/usuario/{id}', [AdminController::class, 'mostrarUsuario']);
+Route::put('/usuario/{id}', [AdminController::class, 'atualizarUsuario']);
+Route::delete('/usuario/{id}', [AdminController::class, 'deletarUsuario']);
 
+Route::post('/login', [AdminController::class, 'loginUsuario']);
 
-Route::post('/usuario/criar', [UserController::class, 'criarusuario']);
-Route::get('/usuario/listar', [App\Http\Controllers\UserController::class, 'listarUsuarios']);  
-
-
-
-Route::post('/admin/criar', [App\Http\Controllers\UserController::class, 'criarAdmin']);
+// Admin
+Route::post('/admin/criar', [AdminController::class, 'criarAdmin']);
+Route::get('/admins', [AdminController::class, 'listarAdmins']);
+Route::put('/admin/{id}', [AdminController::class, 'atualizarAdmin']);
+Route::delete('/admin/{id}', [AdminController::class, 'deletarAdmin']);
