@@ -67,34 +67,50 @@ class GerenciamentoDeCompraController extends Controller
         return response()->json(['message' => 'Compra deletada com sucesso!']);
     }
 
-    
-    public function registrarCompra(Request $request)
-    {
-        return DB::transaction(function ()use($request){
-            $primeiro = GerenciamentoDeFila::orderBy('id')->first();
+public function registrarCompra(Request $request)
+{
+    $request->validate([
+        'produto' => 'required|string',
+        'quantidade' => 'required|integer|min:1',
+        'preco' => 'required|numeric|min:0',
+    ]);
 
-            if (!$primeiro) {
-                return response()->json(['message' => 'Fila vazia!'], 400);
-            }
+    return DB::transaction(function () use ($request) {
 
-            $compra = GerenciamentoDeCompra::create([
-                'user_id' => $primeiro->user_id,
-                 'produto' => $request->produto,
-                 'quantidade' => $request->quantidade,
-                 'preco' => $request->preco,
-            ]);
+        // 1️⃣ Pega o primeiro da fila
+        $primeiro = GerenciamentoDeFila::orderBy('position')->first();
 
-            $primeiro->delete();
-
-            GerenciamentoDeFila::create([
-                'user_id' => $compra->user_id,
-                'ativo' => true,
-            ]);
-
+        if (!$primeiro) {
             return response()->json([
-                'message' => 'Compra registrada e fila atualizada!',
-                'compra' => $compra,
-            ], 201);
-        });
-    }
+                'message' => 'Fila vazia!'
+            ], 400);
+        }
+
+        // 2️⃣ Registra a compra
+        $compra = GerenciamentoDeCompra::create([
+            'user_id' => $primeiro->user_id,
+            'produto' => $request->produto,
+            'quantidade' => $request->quantidade,
+            'preco' => $request->preco,
+        ]);
+
+        // 3️⃣ Remove o usuário da posição atual
+        $primeiro->delete();
+
+        // 4️⃣ Descobre a última posição da fila
+        $ultimaPosicao = GerenciamentoDeFila::max('position') ?? 0;
+
+        // 5️⃣ Reinsere o usuário no FINAL da fila
+        GerenciamentoDeFila::create([
+            'user_id' => $compra->user_id,
+            'position' => $ultimaPosicao + 1,
+            'ativo' => true,
+        ]);
+
+        return response()->json([
+            'message' => 'Compra registrada e usuário movido para o fim da fila!',
+            'compra' => $compra
+        ], 201);
+    });
+}
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TokenRequest;
 use App\Http\Requests\loginRequest;
+use Illuminate\Http\Request;
 class AdminController extends Controller
 {
     public function criarUsuario(TokenRequest $request)
