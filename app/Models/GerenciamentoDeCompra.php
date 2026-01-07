@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class GerenciamentoDeCompra extends Model
 {
-    use HasFactory;
-
+    // use HasFactory;
+    
     protected $table = 'gerenciamento_de_compras'; 
-
+    
     protected $fillable = [
         'user_id',
-        'purchase_time',
-        'amount',
+        'produto',
+        'quantidade',
+        'preco',
     ];
 }

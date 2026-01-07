@@ -9,20 +9,22 @@ use App\Models\GerenciamentoDeFila;
 
 class GerenciamentoDeCompraController extends Controller
 {
-   
+                 
     public function criarCompra(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|integer',
-            'purchase_time' => 'required|date',
-            'amount' => 'required|numeric',
-        ]);
-
-        $compra = new GerenciamentoDeCompra();
-        $compra->user_id = $request->input('user_id');
-        $compra->purchase_time = $request->input('purchase_time');
-        $compra->amount = $request->input('amount');
-        $compra->save();
+       $request->validate([
+        'user_id' => 'required|integer|exists:users,id',
+        'produto' => 'required|string',
+        'quantidade' => 'required|integer|min:1',
+        'preco' => 'required|numeric|min:0',
+    ]);
+          $compra = GerenciamentoDeCompra::create([
+        'user_id' => $request->user_id,
+        'produto' => $request->produto,
+        'quantidade' => $request->quantidade,
+        'preco' => $request->preco,
+    ]);
+    $compra->save();
 
         return response()->json(['message' => 'Compra criada com sucesso!'], 201);
     }
@@ -45,8 +47,10 @@ class GerenciamentoDeCompraController extends Controller
         $compra = GerenciamentoDeCompra::findOrFail($id);
 
         $validado = $request->validate([
-            'purchase_time' => ['sometimes', 'required', 'date'],
-            'amount' => ['sometimes', 'required', 'numeric'],
+         'user_id' => 'required|integer|exists:users,id',
+        'produto' => 'required|string',
+        'quantidade' => 'required|integer|min:1',
+        'preco' => 'required|numeric|min:0',
         ]);
 
         $compra->update($validado);
@@ -66,7 +70,7 @@ class GerenciamentoDeCompraController extends Controller
     
     public function registrarCompra(Request $request)
     {
-        return DB::transaction(function () {
+        return DB::transaction(function ()use($request){
             $primeiro = GerenciamentoDeFila::orderBy('id')->first();
 
             if (!$primeiro) {
@@ -75,8 +79,9 @@ class GerenciamentoDeCompraController extends Controller
 
             $compra = GerenciamentoDeCompra::create([
                 'user_id' => $primeiro->user_id,
-                'amount' => $primeiro->amount,
-                'purchase_time' => now(),
+                 'produto' => $request->produto,
+                 'quantidade' => $request->quantidade,
+                 'preco' => $request->preco,
             ]);
 
             $primeiro->delete();

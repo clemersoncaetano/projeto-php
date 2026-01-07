@@ -1,48 +1,47 @@
 <?php
-
-namespace App\Http\Controllers;
-
-use App\Http\Requests\TokenRequest;
+namespace App\http\Controllers;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\loginRequest;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
-
-
+use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TokenRequest;
+use App\Http\Requests\loginRequest;
 class AdminController extends Controller
 {
-public function criarUsuario(TokenRequest $request)
-{
-    $validado = $request->validated();
+    public function criarUsuario(TokenRequest $request)
+    {
+        $validado = $request->validated();
 
-    $user = new user();
-    $user->name = $validado['name'];
-    $user->email = $validado['email'];
-    $user->password = Hash::make($validado['password']);
-    $user->save();
-    
-    Order::create([
-        'Cliente' => $user->name,
-        'bebida' => 'agua',
-        'status' => 'pendente',
-    ]);
+        // Criar usuário
+        $user = User::create([
+            'name' => $validado['name'],
+            'email' => $validado['email'],
+            'password' => Hash::make($validado['password']),
+        ]);
 
-    $ultimaPosicao = DB::table('gerenciamento_filas')->max('position') ?? 0;
+        // Criar pedido
+        Order::create([
+            'Cliente' => $user->name,
+            'bebida' => 'café',
+            'status' => 'pendente',
+        ]);
 
-    DB::table('gerenciamento_filas')->insert([
-        'userId' => $user->id,
-        'position' => $ultimaPosicao + 1,
-    ]);
+        // Pegar última posição
+        $ultimaPosicao = DB::table('gerenciamento_filas')->max('position') ?? 0;
 
-   
+        // Inserir na fila (CORRETO)
+        DB::table('gerenciamento_filas')->insert([
+            'user_id' => $user->id,
+            'position' => $ultimaPosicao + 1,
+            'ativo' => true
+        ]);
 
-    return response()->json([
-        'message' => 'Usuário criado e adicionado à fila com sucesso!',
-        'user' => $user
-    ], 201);
-}
+        return response()->json([
+            'message' => 'Usuário criado e adicionado à fila com sucesso!',
+            'user' => $user
+        ], 201);
+    }
 
     public function listarUsuarios()
     {
