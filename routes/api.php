@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GerenciamentoDeCompraController;
 use App\Http\Controllers\GerenciamentoDeFilaController;
+use App\Http\Controllers\PagamentoController;
 
 
 Route::post('/usuario/criar', [AdminController::class, 'criarUsuario']);
@@ -35,4 +36,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/proximo', [GerenciamentoDeFilaController::class, 'processarProximo']);
         Route::delete('/{id}', [GerenciamentoDeFilaController::class, 'remover']);
     });
+
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/pagamentos', [PagamentoController::class, 'criar']);
+    Route::post('/pagamentos/{id}/confirmar', [PagamentoController::class, 'confirmar']);
+
+});
+
 });
